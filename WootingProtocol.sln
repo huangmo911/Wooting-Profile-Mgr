@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36212.18 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WootingProtocol", "WootingProtocol\WootingProtocol.csproj", "{066B8872-F3A3-467F-828C-44E6B977D69F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{066B8872-F3A3-467F-828C-44E6B977D69F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{066B8872-F3A3-467F-828C-44E6B977D69F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{066B8872-F3A3-467F-828C-44E6B977D69F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{066B8872-F3A3-467F-828C-44E6B977D69F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FE0C2847-933F-4008-9415-19C15C8FE41B}
+	EndGlobalSection
+EndGlobal
