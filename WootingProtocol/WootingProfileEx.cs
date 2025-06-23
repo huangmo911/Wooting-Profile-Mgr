@@ -1,26 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using JLCommonality;
+using Newtonsoft.Json.Linq;
+using ProtoBuf;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using ProtoBuf;
 using WootingProtocol.Protocol;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WootingProtocol
 {
     [ProtoContract]
     public class JLAI_WootingProfile
     {
-        [ProtoMember(1)] public KeyboardProfile KeyboardProfile { get; set; }
-        [ProtoMember(2)] public ProfileMetadata ProfileMetadata { get; set; }
-        [ProtoMember(3)] public byte[] ActuationProfile { get; set; }
-        [ProtoMember(4)] public byte[] FullRapidTriggerProfile { get; set; }
+        public KeyboardProfile KeyboardProfile { get; set; }
+        public ProfileMetadata ProfileMetadata { get; set; }
+        public string ActuationProfile { get; set; }
+        public string FullRapidTriggerProfile { get; set; }
     }
 
     [ProtoContract]
     public class JlaiWootingProfileList
     {
-        [ProtoMember(1)]
         public List<JLAI_WootingProfile> Profiles { get; set; } = new();
-        [ProtoMember(2)]
         public int CurrentProfileId { get; set; }
     }
 
@@ -31,7 +33,7 @@ namespace WootingProtocol
         /// </summary>  
         /// <param name="wootingProtocol"></param>  
         /// <param name="filePath"></param>  
-        public static void Save(this WootingProtocol wootingProtocol, string filePath)
+        public static void Save(this WootingProtocol wootingProtocol, string filePath, bool encryption)
         {
             var profileCount = wootingProtocol.GetProfileCount();
 
@@ -52,12 +54,18 @@ namespace WootingProtocol
                 {
                     KeyboardProfile = keyboardProfile,
                     ProfileMetadata = profileMetadata,
-                    ActuationProfile = actuationProfile,
-                    FullRapidTriggerProfile = wootingProtocol.GetFullRapidTriggerProfile(i)
+                    ActuationProfile = BitConverter.ToString(actuationProfile),
+                    FullRapidTriggerProfile = BitConverter.ToString(wootingProtocol.GetFullRapidTriggerProfile(i))
                 });
             }
 
-            File.WriteAllBytes(filePath, Serialize(jlaiWootingProfileList));
+            var text = JObject.FromObject(jlaiWootingProfileList).ToString();
+            if (encryption)
+            {
+                text = WebComm.EncryptString(text);
+            }
+
+            File.WriteAllText(filePath, text);
         }
 
         /// <summary>  
@@ -65,11 +73,18 @@ namespace WootingProtocol
         /// </summary>  
         /// <param name="wootingProtocol"></param>  
         /// <param name="filePath"></param>  
-        public static void Load(this WootingProtocol wootingProtocol, string filePath)
+        public static void Load(this WootingProtocol wootingProtocol, string filePath, bool encryption)
         {
             if (!File.Exists(filePath)) return;
 
-            var jlaiWootingProfileList = Deserialize<JlaiWootingProfileList>(File.ReadAllBytes(filePath));
+            var text = File.ReadAllText(filePath);
+
+            if (encryption)
+            {
+                text = WebComm.DecryptString(text);
+            }
+
+            var jlaiWootingProfileList = JObject.Parse(text).Value<JlaiWootingProfileList>();
             if (jlaiWootingProfileList?.Profiles == null || jlaiWootingProfileList.Profiles.Count == 0) return;
 
             AdjustProfileCount(wootingProtocol, jlaiWootingProfileList.Profiles.Count);
@@ -86,28 +101,26 @@ namespace WootingProtocol
                 wootingProtocol.SetKeyboardProfile(profile.KeyboardProfile, new ProfileReport { ProfileIndex = i, Save = true });
                 Thread.Sleep(200);
 
-                wootingProtocol.SetActuationProfile(i, profile.ActuationProfile);
+                wootingProtocol.SetActuationProfile(i, StringToByteArray(profile.ActuationProfile));
                 Thread.Sleep(200);
 
-                wootingProtocol.SetFullRapidTriggerProfile(i, profile.FullRapidTriggerProfile);
+                wootingProtocol.SetFullRapidTriggerProfile(i, StringToByteArray(profile.FullRapidTriggerProfile));
             }
 
             wootingProtocol.ActivateProfile(jlaiWootingProfileList.CurrentProfileId);
         }
-
-        private static byte[] Serialize<T>(T obj)
+        public static byte[] StringToByteArray(string hexString)
         {
-            using var ms = new MemoryStream();
-            Serializer.Serialize(ms, obj);
-            return ms.ToArray();
-        }
+            string[] hexValues = hexString.Split('-');
+            byte[] bytes = new byte[hexValues.Length];
 
-        private static T Deserialize<T>(byte[] data)
-        {
-            using var ms = new MemoryStream(data);
-            return Serializer.Deserialize<T>(ms);
-        }
+            for (int i = 0; i < hexValues.Length; i++)
+            {
+                bytes[i] = Convert.ToByte(hexValues[i], 16);
+            }
 
+            return bytes;
+        }
         private static void AdjustProfileCount(WootingProtocol wootingProtocol, int targetCount)
         {
             var currentCount = wootingProtocol.GetProfileCount();

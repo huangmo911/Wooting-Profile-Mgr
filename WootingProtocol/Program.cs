@@ -21,9 +21,9 @@ namespace WootingProtocol
                     if (!wootingProtocol.Ping())
                         return;
 
-                    //wootingProtocol.Save("h60.JlaiWootingProfileList");
+                    wootingProtocol.Save("h60.JlaiWootingProfileList", false);
 
-                    wootingProtocol.Load("h60.JlaiWootingProfileList");
+                    //wootingProtocol.Load("h60.JlaiWootingProfileList");
                 }
                 finally
                 {
