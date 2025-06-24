@@ -33,7 +33,7 @@ namespace WootingProtocol
         /// </summary>  
         /// <param name="wootingProtocol"></param>  
         /// <param name="filePath"></param>  
-        public static void Save(this WootingProtocol wootingProtocol, string filePath, bool encryption)
+        public static void Save(this Protocol.WootingProtocol wootingProtocol, string filePath, bool encryption)
         {
             var profileCount = wootingProtocol.GetProfileCount();
 
@@ -73,7 +73,7 @@ namespace WootingProtocol
         /// </summary>  
         /// <param name="wootingProtocol"></param>  
         /// <param name="filePath"></param>  
-        public static void Load(this WootingProtocol wootingProtocol, string filePath, bool encryption)
+        public static void Load(this Protocol.WootingProtocol wootingProtocol, string filePath, bool encryption)
         {
             if (!File.Exists(filePath)) return;
 
@@ -121,7 +121,7 @@ namespace WootingProtocol
 
             return bytes;
         }
-        private static void AdjustProfileCount(WootingProtocol wootingProtocol, int targetCount)
+        private static void AdjustProfileCount(Protocol.WootingProtocol wootingProtocol, int targetCount)
         {
             var currentCount = wootingProtocol.GetProfileCount();
 

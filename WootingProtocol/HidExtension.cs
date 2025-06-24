@@ -1,11 +1,8 @@
-﻿using HidSharp;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HidSharp;
 
-namespace HidManager
+namespace WootingProtocol
 {
     /// <summary>
     /// HidStream扩展方法

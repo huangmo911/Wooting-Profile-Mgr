@@ -1,5 +1,4 @@
-﻿using HidManager;
-using HidSharp;
+﻿using HidSharp;
 using System;
 using System.Linq;
 
@@ -17,11 +16,11 @@ namespace WootingProtocol
                 {
                     Console.WriteLine(device.Device);
 
-                    var wootingProtocol = new WootingProtocol(device);
+                    var wootingProtocol = new Protocol.WootingProtocol(device);
                     if (!wootingProtocol.Ping())
                         return;
 
-                    wootingProtocol.Save("h60.JlaiWootingProfileList", false);
+                    wootingProtocol.Save($"{hidDevice.GetFriendlyName()}.JlaiWootingProfileList", false);
 
                     //wootingProtocol.Load("h60.JlaiWootingProfileList");
                 }
